@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ADD8E6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            width: 800px;
+            height: 400px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentence Sentiment Analysis</h1>
+        <p>Enter a sentence below to analyze its sentiment:</p>
+        <form id="sentimentForm">
+            <input type="text" id="sentenceInput" placeholder="Type your sentence here..." required>
+            <button type="submit">Analyze Sentiment</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script>
+        document.getElementById("sentimentForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Prevent form from submitting the traditional way
+            
+            const textInput = document.getElementById("sentenceInput").value;
+
+            if (!textInput.trim()) {
+                alert("Please enter some text!");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ text: textInput })
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById("result").innerText = 
+                        `Sentiment: ${result[0].label}, Confidence: ${result[0].score.toFixed(3)}`;
+                } else {
+                    document.getElementById("result").innerText = 
+                        "Error analyzing sentiment. Please try again.";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("result").innerText = "Error analyzing sentiment. Please try again.";
+            }
+        });
+    </script>
+</body>
+</html>
